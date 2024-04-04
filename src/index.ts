@@ -5,6 +5,11 @@ const startupDebugger = require('debug')('app:startup');
 import { router as appRouter } from '../routes/home';
 import { router as genresRouter } from '../routes/genres';
 // const dbDebugger = require('debug')('app:db');
+import mongoose from 'mongoose';
+
+mongoose.connect('mongodb://localhost/vidly')
+  .then(() => console.log('connected to MongoDb...'))
+  .catch(err => console.error('Could not connect to MongoDb...'));
 
 const app = express();
 
