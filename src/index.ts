@@ -4,6 +4,7 @@ import morgan from 'morgan';
 const startupDebugger = require('debug')('app:startup');
 import { router as appRouter } from '../routes/home';
 import { router as genresRouter } from '../routes/genres';
+import { router as customersRouter } from '../routes/customers';
 // const dbDebugger = require('debug')('app:db');
 import mongoose from 'mongoose';
 
@@ -22,6 +23,7 @@ app.use(helmet()); // adds http headers to requests to make it safer
 
 app.use('/', appRouter);
 app.use('/api/genres', genresRouter);
+app.use('/api/customers', customersRouter);
 
 if (app.get('env') === 'development') {
   app.use(morgan('tiny')); // HTTP request logger
