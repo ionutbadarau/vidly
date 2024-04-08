@@ -1,28 +1,6 @@
 import express, { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import { Customer, validateCustomer } from '../models/customer';
 export const router = express.Router();
-import Joi from 'joi';
-
-type CustomerType = {
-  name: string;
-  isGold: boolean;
-  phone: string;
-}
-
-const customerSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  isGold: {
-    type: Boolean,
-    required: true,
-    default: false
-  },
-  phone: String
-});
-
-const Customer = mongoose.model('Customer', customerSchema);
 
 router.get('/', async (req: Request, res: Response) => {
   const customers = await Customer.find().sort('name');
@@ -71,15 +49,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
 router.delete('/:id', async (req: Request, res: Response) => {
   const customerToDelete = await Customer.findByIdAndDelete(req.params.id);
-
-  if (!customerToDelete) return res.status(404).send('The genre with given id was not found..')
+  if (!customerToDelete) return res.status(404).send('The customer with given id was not found..')
 
   res.send(customerToDelete);
 });
-
-function validateCustomer(customer: CustomerType) {
-  const genreNameSchema = Joi.object({
-    name: Joi.string().min(3).required(),
-  });
-  return genreNameSchema.validate({ name: customer.name });
-}

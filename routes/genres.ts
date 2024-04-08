@@ -1,20 +1,6 @@
 import express, { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import { Genre, validateGenre } from '../models/genre';
 export const router = express.Router();
-import Joi from 'joi';
-
-type GenreType = {
-  name: string;
-}
-
-const genreSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  }
-});
-
-const Genre = mongoose.model('Genre', genreSchema);
 
 router.get('/', async (req: Request, res: Response) => {
   const genres = await Genre.find().sort('name');
@@ -60,10 +46,3 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
   res.send(genreToDelete);
 });
-
-function validateGenre(genre: GenreType) {
-  const genreNameSchema = Joi.object({
-    name: Joi.string().min(3).required()
-  });
-  return genreNameSchema.validate({ name: genre.name });
-}
