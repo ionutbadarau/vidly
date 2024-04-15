@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { Customer, validateCustomer } from '../models/customer';
+import { Customer, ICustomer, validateCustomer } from '../models/customer';
 export const router = express.Router();
 
 router.get('/', async (req: Request, res: Response) => {
@@ -17,7 +17,7 @@ router.post('/', async (req: Request, res: Response) => {
   const { error } = validateCustomer(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let newCustomer = new Customer({
+  let newCustomer = new Customer<ICustomer>({
     name: req.body.name,
     isGold: req.body.isGold,
     phone: req.body.phone
@@ -35,11 +35,12 @@ router.put('/:id', async (req: Request, res: Response) => {
   const { error } = validateCustomer(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const changedCustomer = await Customer.findByIdAndUpdate(req.params.id, {
+  const reqData: ICustomer = {
     name: req.body.name,
     isGold: req.body.isGold,
     phone: req.body.phone
-  }, {
+  }
+  const changedCustomer = await Customer.findByIdAndUpdate(req.params.id, reqData, {
     new: true  // returns the updated record
   });
   if (!changedCustomer) return res.status(404).send(`Customer with id ${req.params.id} was not found.`);

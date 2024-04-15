@@ -1,22 +1,24 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 import Joi from 'joi';
 
-type GenreType = {
+export interface IGenre {
   name: string;
 }
 
-const genreSchema = new mongoose.Schema({
+export const genreSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
+    minLength: 5,
+    maxLength: 50
   }
 });
 
-export const Genre = mongoose.model('Genre', genreSchema);
+export const Genre = model('Genre', genreSchema);
 
-export function validateGenre(genre: GenreType) {
+export function validateGenre(genre: IGenre) {
   const genreNameSchema = Joi.object({
-    name: Joi.string().min(3).required()
+    name: Joi.string().min(5).max(50).required()
   });
   return genreNameSchema.validate({ name: genre.name });
 }

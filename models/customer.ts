@@ -1,13 +1,12 @@
-import mongoose from 'mongoose';
+import { Schema, model, Model } from 'mongoose';
 import Joi from 'joi';
 
-type CustomerType = {
+export interface ICustomer {
   name: string;
   isGold: boolean;
   phone: string;
 }
-
-const customerSchema = new mongoose.Schema({
+const customerSchema = new Schema<ICustomer>({
   name: {
     type: String,
     required: true,
@@ -27,9 +26,9 @@ const customerSchema = new mongoose.Schema({
   }
 });
 
-export const Customer = mongoose.model('Customer', customerSchema);
+export const Customer = model<ICustomer>('Customer', customerSchema);
 
-export function validateCustomer(customer: CustomerType) {
+export function validateCustomer(customer: ICustomer) {
   const customerValidationSchema = Joi.object({
     name: Joi.string().min(5).max(50).required(),
     isGold: Joi.boolean()

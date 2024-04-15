@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { Genre, validateGenre } from '../models/genre';
+import { Genre, IGenre, validateGenre } from '../models/genre';
 export const router = express.Router();
 
 router.get('/', async (req: Request, res: Response) => {
@@ -17,7 +17,7 @@ router.post('/', async (req: Request, res: Response) => {
   const { error } = validateGenre(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let newGenre = new Genre({ name: req.body.name });
+  let newGenre = new Genre<IGenre>({ name: req.body.name });
 
   try {
     newGenre = await newGenre.save();
@@ -31,7 +31,8 @@ router.put('/:id', async (req: Request, res: Response) => {
   const { error } = validateGenre(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const changedGenre = await Genre.findByIdAndUpdate(req.params.id, { name: req.body.name }, {
+  const reqData: IGenre = { name: req.body.name };
+  const changedGenre = await Genre.findByIdAndUpdate(req.params.id, reqData, {
     new: true  // returns the updated record
   });
   if (!changedGenre) return res.status(404).send(`Genre with id ${req.params.id} was not found.`);
