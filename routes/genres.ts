@@ -32,9 +32,7 @@ router.put('/:id', async (req: Request, res: Response) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const reqData: IGenre = { name: req.body.name };
-  const changedGenre = await Genre.findByIdAndUpdate(req.params.id, reqData, {
-    new: true  // returns the updated record
-  });
+  const changedGenre = await Genre.findByIdAndUpdate(req.params.id, reqData, { new: true });
   if (!changedGenre) return res.status(404).send(`Genre with id ${req.params.id} was not found.`);
 
   res.send(changedGenre);

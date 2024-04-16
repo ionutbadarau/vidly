@@ -1,29 +1,40 @@
-import { Schema, model } from 'mongoose';
+import { Model, Schema, Types, model } from 'mongoose';
 import Joi from 'joi';
 
 import { genreSchema } from './genre';
 
-export interface IMovie {
+interface IMovieRequest {
   title: string;
-  genre: {
-    _id: string,
-    name: string
-  };
+  genreId: string;
   numberInStock?: number;
   dailyRentalRate?: number;
 }
 
-const movieSchema = new Schema({
+// Create the genre interface here (not in genre.ts)
+// because I maybe don't want to store all the genre properties
+// in my `genre` subdocument. 
+interface IMovieGenre {
+  _id: Types.ObjectId;
+  name: string;
+}
+
+export interface IMovie {
+  title: string;
+  genre: IMovieGenre;
+  numberInStock?: number;
+  dailyRentalRate?: number;
+}
+
+type MovieModelType = Model<IMovie>;
+
+const movieSchema = new Schema<IMovie, MovieModelType>({
   title: {
     type: String,
     required: true,
     minLength: 5,
     maxLength: 255
   },
-  genre: {
-    type: genreSchema,
-    required: true,
-  },
+  genre: new Schema<IMovieGenre>({ name: String }),
   numberInStock: {
     type: Number,
     default: 0,
@@ -38,18 +49,20 @@ const movieSchema = new Schema({
   }
 });
 
-export const Movie = model('Movie', movieSchema);
+export const Movie = model<IMovie, MovieModelType>('Movie', movieSchema);
 
-export function validateMovie(movie: any) {
+export function validateMovie(movie: IMovieRequest) {
   const movieValidationSchema = Joi.object({
-    title: Joi.string().min(5).max(50).required(),
-    genreId: Joi.string().required(),
-    numberInStock: Joi.number().min(0),
-    dailyRentalRate: Joi.number().min(0)
+    title: Joi.string().min(5).max(255).required(),
+    genreId: Joi.string().required(), // genreId not genre, because the request will be made with the gerneId
+    numberInStock: Joi.number().min(0).max(255),
+    dailyRentalRate: Joi.number().min(0).max(255),
   });
 
   return movieValidationSchema.validate({
     title: movie.title,
-    genreId: movie.genreId
+    genreId: movie.genreId,
+    numberInStock: movie.numberInStock,
+    dailyRentalRate: movie.dailyRentalRate
   });
 }

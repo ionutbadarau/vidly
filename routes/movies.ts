@@ -22,7 +22,7 @@ router.post('/', async (req: Request, res: Response) => {
   const genre = await Genre.findById(req.body.genreId);
   if (!genre) return res.status(400).send('Invalid genre.');
 
-  let newMovie = new Movie({
+  let newMovie = new Movie<IMovie>({
     title: req.body.title,
     genre: {
       _id: genre._id,
@@ -48,24 +48,21 @@ router.put('/:id', async (req: Request, res: Response) => {
   const genre = await Genre.findById(req.body.genreId);
   if (!genre) return res.status(400).send('Invalid genre.');
 
-  // this should be done by update, but it doesn't work
-  const delMovie = await Movie.findByIdAndDelete(req.params.id);
-  if (!delMovie) return res.status(404).send('The movie with the given ID was not found.');
-
-  let newMovie = new Movie({
+  const updatedMov: IMovie = {
     title: req.body.title,
     genre: {
       _id: genre._id,
       name: genre.name
     },
-    dailyRentalRate: req.body.dailyRentalRate,
-    numberInStock: req.body.numberInStock,
-  });
-
+    numberInStock: req.body.number,
+    dailyRentalRate: req.body.dailyRentalRate
+  };
   try {
-    newMovie = await newMovie.save();
+    const mov = await Movie.findByIdAndUpdate(req.params.id, updatedMov, { new: true });
 
-    res.send(newMovie);
+    if (!mov) return res.status(400).send('The movie with the given ID was not found.');
+
+    res.send(mov);
   } catch (error: any) {
     res.status(400).send(error.message);
   }

@@ -31,7 +31,12 @@ export const Customer = model<ICustomer>('Customer', customerSchema);
 export function validateCustomer(customer: ICustomer) {
   const customerValidationSchema = Joi.object({
     name: Joi.string().min(5).max(50).required(),
-    isGold: Joi.boolean()
+    isGold: Joi.boolean().required(),
+    phone: Joi.string().min(5).max(50).required()
   });
-  return customerValidationSchema.validate({ name: customer.name });
+  return customerValidationSchema.validate({
+    name: customer.name,
+    isGold: customer.isGold,
+    phone: customer.phone
+  });
 }
